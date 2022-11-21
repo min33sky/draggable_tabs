@@ -10,23 +10,42 @@ export default function DraggableTabs({ tabItems }: Props) {
   const [showLeftIcon, setShowLeftIcon] = useState(false);
   const [showRightIcon, setShowRightIcon] = useState(true);
   const [selectTab, setSelectTab] = useState(0);
+
+  //? 터치 전용 상태 (movementX는 MouseEvent에서만 사용 가능)
+  const [prevPageX, setPrevPageX] = useState(0); // 이전 X 좌표
+
   const scrollRef = useRef<HTMLUListElement>(null);
 
-  const handleDragStart = (e: React.MouseEvent<HTMLUListElement>) => {
+  const handleDragStart = (
+    e: React.MouseEvent<HTMLUListElement> & React.TouchEvent<HTMLUListElement>,
+  ) => {
     setIsDragging(true);
+
+    if (e.type === 'touchstart') {
+      setPrevPageX(e.touches[0].pageX);
+    }
   };
 
-  const handleDragging = (e: React.MouseEvent<HTMLUListElement>) => {
+  const handleDragging = (
+    e: React.MouseEvent<HTMLUListElement> & React.TouchEvent<HTMLUListElement>,
+  ) => {
     if (isDragging) {
-      //? movementX is the distance between the mouse pointer and the starting point of the mouse pointer
-      scrollRef.current?.scrollTo({
-        left: scrollRef.current.scrollLeft + e.movementX,
-      });
+      if (e.type === 'touchmove') {
+        scrollRef.current?.scrollTo({
+          left: scrollRef.current.scrollLeft + e.touches[0].pageX - prevPageX,
+        });
+      } else if (e.type === 'mousemove') {
+        //? movementX is the distance between the mouse pointer and the starting point of the mouse pointer
+        scrollRef.current?.scrollTo({
+          left: scrollRef.current.scrollLeft + e.movementX,
+        });
+      }
+
       handleArrowIcons();
     }
   };
 
-  const handleDragEnd = (e: React.MouseEvent<HTMLUListElement>) => {
+  const handleDragEnd = () => {
     setIsDragging(false);
   };
 
@@ -88,9 +107,12 @@ export default function DraggableTabs({ tabItems }: Props) {
           isDragging ? 'cursor-grabbing ' : 'cursor-grab '
         }`}
         onMouseDown={handleDragStart}
+        onTouchStart={handleDragStart}
         onMouseMove={handleDragging}
+        onTouchMove={handleDragging}
         onMouseUp={handleDragEnd}
         onMouseLeave={handleDragEnd}
+        onTouchEnd={handleDragEnd}
       >
         {tabItems.map((tabItem, index) => (
           <li
