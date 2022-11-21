@@ -87,7 +87,7 @@ export default function DraggableTabs({ tabItems }: Props) {
   };
 
   return (
-    <div className="relative w-10/12 max-w-xl rounded-md bg-slate-200 px-10 py-5 shadow-lg">
+    <div className="relative w-10/12 max-w-xl overflow-hidden rounded-md bg-slate-200 px-10 py-5 shadow-lg">
       {showLeftIcon && (
         <div className="pointer-events-none absolute top-0  left-4 flex h-full w-32 items-center bg-gradient-to-r from-slate-200">
           <button
@@ -104,7 +104,7 @@ export default function DraggableTabs({ tabItems }: Props) {
         aria-label="tabs-box"
         ref={scrollRef}
         className={`flex items-center gap-3 overflow-x-hidden whitespace-nowrap  ${
-          isDragging ? 'cursor-grabbing ' : 'cursor-grab '
+          isDragging ? 'cursor-grabbing' : 'cursor-grab'
         }`}
         onMouseDown={handleDragStart}
         onTouchStart={handleDragStart}
