@@ -9,6 +9,7 @@ export default function DraggableTabs({ tabItems }: Props) {
   const [isDragging, setIsDragging] = useState(false);
   const [showLeftIcon, setShowLeftIcon] = useState(false);
   const [showRightIcon, setShowRightIcon] = useState(true);
+  const [selectTab, setSelectTab] = useState(0);
   const scrollRef = useRef<HTMLUListElement>(null);
 
   const handleDragStart = (e: React.MouseEvent<HTMLUListElement>) => {
@@ -17,11 +18,11 @@ export default function DraggableTabs({ tabItems }: Props) {
 
   const handleDragging = (e: React.MouseEvent<HTMLUListElement>) => {
     if (isDragging) {
-      console.log('move', e.movementX, e.pageX, e.clientX);
+      //? movementX is the distance between the mouse pointer and the starting point of the mouse pointer
       scrollRef.current?.scrollTo({
         left: scrollRef.current.scrollLeft + e.movementX,
       });
-      handleIcons();
+      handleArrowIcons();
     }
   };
 
@@ -29,7 +30,7 @@ export default function DraggableTabs({ tabItems }: Props) {
     setIsDragging(false);
   };
 
-  const handleClick = (e: React.MouseEvent) => {
+  const handleClickArrowIcons = (e: React.MouseEvent) => {
     const target = e.currentTarget;
     if (target.id === 'leftBtn') {
       scrollRef.current?.scrollTo({
@@ -44,13 +45,20 @@ export default function DraggableTabs({ tabItems }: Props) {
     }
 
     setTimeout(() => {
-      handleIcons();
+      handleArrowIcons();
     }, 500);
   };
 
-  const handleIcons = () => {
+  const handleClickTab = (idx: number) => {
+    setSelectTab(idx);
+  };
+
+  /**
+   * @description
+   * This function will handle the visibility of the arrow icons
+   */
+  const handleArrowIcons = () => {
     if (scrollRef.current) {
-      console.log('ㅎㅎㅎ: ', scrollRef.current.scrollLeft);
       setShowLeftIcon(scrollRef.current.scrollLeft > 0);
       setShowRightIcon(
         scrollRef.current.scrollLeft <
@@ -65,7 +73,7 @@ export default function DraggableTabs({ tabItems }: Props) {
         <div className="pointer-events-none absolute top-0  left-4 flex h-full w-32 items-center bg-gradient-to-r from-slate-200">
           <button
             id="leftBtn"
-            onClick={handleClick}
+            onClick={handleClickArrowIcons}
             className={`rounded-full p-2 transition hover:bg-slate-300/50`}
           >
             <ArrowLeftIcon className="pointer-events-auto h-5 w-5" />
@@ -87,7 +95,10 @@ export default function DraggableTabs({ tabItems }: Props) {
         {tabItems.map((tabItem, index) => (
           <li
             key={index}
-            className="pointer-events-none flex h-12 w-32 select-none items-center justify-center rounded-md bg-slate-100 px-2"
+            onClick={() => handleClickTab(index)}
+            className={`flex h-12 w-32 select-none items-center justify-center rounded-md bg-slate-100 px-2 ${
+              selectTab === index ? 'bg-slate-400' : ''
+            }`}
           >
             {tabItem}
           </li>
@@ -98,7 +109,7 @@ export default function DraggableTabs({ tabItems }: Props) {
         <div className="pointer-events-none absolute top-0 right-4 flex h-full w-32 items-center justify-end bg-gradient-to-l from-slate-200">
           <button
             id="rightBtn"
-            onClick={handleClick}
+            onClick={handleClickArrowIcons}
             className="rounded-full p-2 transition hover:bg-slate-300/50"
           >
             <ArrowRightIcon className="pointer-events-auto h-5 w-5" />
