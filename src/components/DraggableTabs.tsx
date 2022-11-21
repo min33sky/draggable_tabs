@@ -7,6 +7,8 @@ interface Props {
 
 export default function DraggableTabs({ tabItems }: Props) {
   const [isDragging, setIsDragging] = useState(false);
+  const [showLeftIcon, setShowLeftIcon] = useState(false);
+  const [showRightIcon, setShowRightIcon] = useState(true);
   const scrollRef = useRef<HTMLUListElement>(null);
 
   const handleDragStart = (e: React.MouseEvent<HTMLUListElement>) => {
@@ -15,13 +17,11 @@ export default function DraggableTabs({ tabItems }: Props) {
 
   const handleDragging = (e: React.MouseEvent<HTMLUListElement>) => {
     if (isDragging) {
-      const ul = e.currentTarget;
-      const li = e.target as HTMLLIElement;
-      const x = e.clientX;
       console.log('move', e.movementX, e.pageX, e.clientX);
       scrollRef.current?.scrollTo({
         left: scrollRef.current.scrollLeft + e.movementX,
       });
+      handleIcons();
     }
   };
 
@@ -42,19 +42,36 @@ export default function DraggableTabs({ tabItems }: Props) {
         behavior: 'smooth',
       });
     }
+
+    setTimeout(() => {
+      handleIcons();
+    }, 500);
+  };
+
+  const handleIcons = () => {
+    if (scrollRef.current) {
+      console.log('ㅎㅎㅎ: ', scrollRef.current.scrollLeft);
+      setShowLeftIcon(scrollRef.current.scrollLeft > 0);
+      setShowRightIcon(
+        scrollRef.current.scrollLeft <
+          scrollRef.current.scrollWidth - scrollRef.current.clientWidth,
+      );
+    }
   };
 
   return (
     <div className="relative w-10/12 max-w-xl rounded-md bg-slate-200 px-10 py-5 shadow-lg">
-      <div className="pointer-events-none absolute top-0  left-4 flex h-full w-32 items-center bg-gradient-to-r from-slate-200">
-        <button
-          id="leftBtn"
-          onClick={handleClick}
-          className="rounded-full p-2 transition hover:bg-slate-300/50"
-        >
-          <ArrowLeftIcon className="pointer-events-auto h-5 w-5" />
-        </button>
-      </div>
+      {showLeftIcon && (
+        <div className="pointer-events-none absolute top-0  left-4 flex h-full w-32 items-center bg-gradient-to-r from-slate-200">
+          <button
+            id="leftBtn"
+            onClick={handleClick}
+            className={`rounded-full p-2 transition hover:bg-slate-300/50`}
+          >
+            <ArrowLeftIcon className="pointer-events-auto h-5 w-5" />
+          </button>
+        </div>
+      )}
 
       <ul
         aria-label="tabs-box"
@@ -77,15 +94,17 @@ export default function DraggableTabs({ tabItems }: Props) {
         ))}
       </ul>
 
-      <div className="pointer-events-none absolute top-0 right-4 flex h-full w-32 items-center justify-end bg-gradient-to-l from-slate-200">
-        <button
-          id="rightBtn"
-          onClick={handleClick}
-          className="rounded-full p-2 transition hover:bg-slate-300/50"
-        >
-          <ArrowRightIcon className="pointer-events-auto h-5 w-5" />
-        </button>
-      </div>
+      {showRightIcon && (
+        <div className="pointer-events-none absolute top-0 right-4 flex h-full w-32 items-center justify-end bg-gradient-to-l from-slate-200">
+          <button
+            id="rightBtn"
+            onClick={handleClick}
+            className="rounded-full p-2 transition hover:bg-slate-300/50"
+          >
+            <ArrowRightIcon className="pointer-events-auto h-5 w-5" />
+          </button>
+        </div>
+      )}
     </div>
   );
 }
